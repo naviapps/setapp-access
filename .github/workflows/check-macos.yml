@@ -52,7 +52,7 @@ jobs:
           xcrun swift test --build-system swiftbuild "${swift_flags[@]}"
           python3 -B tools/consumer.py "${consumer_flags[@]}"
   distribution:
-    name: SDK distribution checks
+    name: Source and tooling checks
     runs-on: xcode-27
     timeout-minutes: 45
     env:
