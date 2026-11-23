@@ -1,19 +1,21 @@
+SDK_TOOLING ?= mise run sdk-tooling --
+
 # SwiftPM 6.3's Swift Build passes -suppress-warnings to SetappResources.
 SWIFT_6_3 = $(shell xcrun swift --version 2>/dev/null | grep -Eq 'Swift version 6\.3([[:space:].]|$$)' && printf yes)
 SWIFT_FLAGS = --build-system swiftbuild -Xswiftc -strict-concurrency=complete $(if $(SWIFT_6_3),,-Xswiftc -warnings-as-errors)
 
 .DEFAULT_GOAL := check
-.PHONY: check check-distribution lint format test test-tools build-macos test-consumer
+.PHONY: check check-source lint format test test-tools build-macos test-consumer
 
-check: check-distribution test test-consumer
+check: check-source test test-consumer
 
-check-distribution: lint test-tools
+check-source: lint test-tools
 
 lint:
-	mise exec -- python3 -B tools/quality.py check
+	$(SDK_TOOLING) quality check
 
 format:
-	mise exec -- python3 -B tools/quality.py format
+	$(SDK_TOOLING) quality format
 
 test:
 	xcrun swift test $(SWIFT_FLAGS)
@@ -25,4 +27,4 @@ build-macos:
 	xcrun swift build --target SetappAccessMacOS $(SWIFT_FLAGS)
 
 test-consumer:
-	python3 -B tools/consumer.py $(if $(SWIFT_6_3),--allow-warnings)
+	$(SDK_TOOLING) swift-consumer $(if $(SWIFT_6_3),--allow-warnings)

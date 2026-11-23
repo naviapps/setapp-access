@@ -1,5 +1,9 @@
+[settings]
+activate_aggressive = true
+
 [tools]
 python = "3.15.1"
+uv = "0.13.6"
 ruff = "0.17.3"
 dprint = "0.64.3"
 swiftlint = { version = "0.65.1", os = ["macos"] }
@@ -8,8 +12,11 @@ shellcheck = { version = "0.11.0", os = ["macos", "linux"] }
 
 [tasks.lint]
 description = "Check owned Swift, Python and documentation without running the vendor SDK"
-run = "python3 -B tools/quality.py check"
+run = "mise run sdk-tooling -- quality check"
 
 [tasks.format]
 description = "Format owned source while preserving original notices"
-run = "python3 -B tools/quality.py format"
+run = "mise run sdk-tooling -- quality format"
+
+[tasks.sdk-tooling]
+run = "uvx --from git+https://github.com/naviapps/sdk-tooling.git@2921615e70d9239ce10202549751a25d18b8c0f7 sdk-tooling"

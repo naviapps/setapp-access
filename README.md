@@ -180,7 +180,8 @@ observation), `make build-macos` (compile the official adapter),
 adapter), and `make test-tools` (portable fixture-boundary checks). Run each
 through `mise exec --`; none executes a vendor-linked executable.
 
-Maintainer lint and format use the tools declared in `mise.toml`. Run
+Maintainer lint, format and consumer checks use the public SDK Tooling revision in
+`mise.toml`. Run
 `make lint` to check source or `make format` to apply formatting. GitHub Actions
 runs the Swift tests and the same external consumer on macOS 26 with Xcode 26.6
 and macOS 27 with Xcode 27.2. The external consumer compiles the macOS adapter
@@ -193,7 +194,7 @@ the external package imports only public products. The check isolates SwiftPM
 state and runs Swift Build with strict concurrency and warnings as errors.
 The Make targets allow compiler warnings with Swift 6.3 to accommodate flags
 from the Setapp framework. Supply private dependency configuration directly to
-`tools/consumer.py` with `--git-config` and `--mirror-config`.
+`mise run sdk-tooling -- swift-consumer` with `--git-config` and `--mirror-config`.
 
 The `SetappSnapshotConsumer` executable depends only on the vendor-free product.
 It checks active, inactive and unavailable snapshots, including expiration metadata
