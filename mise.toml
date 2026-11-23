@@ -19,4 +19,4 @@ description = "Format owned source while preserving original notices"
 run = "mise run sdk-tooling -- quality format"
 
 [tasks.sdk-tooling]
-run = "uvx --from git+https://github.com/naviapps/sdk-tooling.git@5e81874d4864541b5eace3ebce2eb407ef868739 sdk-tooling"
+run = "uvx --from git+https://github.com/naviapps/sdk-tooling.git@306b97044d6d2ed4769a22e22034981dbb932f4c sdk-tooling"
