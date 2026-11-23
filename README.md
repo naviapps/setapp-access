@@ -25,8 +25,15 @@ access decision. Snapshots are transient values and do not grant offline access.
 
 ## Installation
 
-Pin the repository to a published full commit in the host's `Package.swift` and
-select the vendor-free product for snapshot-only use:
+Pin the repository to a published full commit in the host's `Package.swift`.
+Select the product for each target according to how it uses Setapp.
+
+| Target uses                                | Product             |
+| ------------------------------------------ | ------------------- |
+| Snapshot values in host code or tests      | `SetappAccess`      |
+| Live subscription status in the Setapp app | `SetappAccessMacOS` |
+
+For example, a host that uses snapshot values can declare:
 
 ```swift
 dependencies: [
@@ -43,9 +50,9 @@ targets: [
 ]
 ```
 
-SwiftPM resolves the official framework even for the vendor-free product, so a fresh
-resolution needs access to its repository. Setapp apps can select `SetappAccessMacOS`
-and follow the [app integration](#app-integration) linking instructions.
+SwiftPM resolves the official framework for both products. A fresh resolution
+needs access to its repository. Follow [App integration](#app-integration) for
+the Setapp app target's linker and bundle settings.
 
 For SwiftPM command-line builds that link `SetappAccessMacOS` with Swift 6.3,
 pass `--build-system swiftbuild` to `swift build` or `swift test` so SwiftPM
@@ -108,14 +115,20 @@ Setapp configuration before release.
 Call `reportUserInteraction()` explicitly for meaningful user activity according
 to the host's usage policy. Call the official framework for vendor release notes.
 
-The official macOS framework initializes before `main`. The host must provide
-Setapp's key/configuration/resources and the official force-load linker setting:
-`-force_load "$(BUILT_PRODUCTS_DIR)/libSetapp.a"` (adjust the archive path for the
-host's build layout). Command-line SwiftPM stages `libSetapp.a` in its build
-products; force-load that same archive. For direct archive linking, use
-`Setapp.xcframework/macos-arm64_x86_64/libSetapp.a`. This SDK supplies
-no host-specific linker flags. Bundle the unmodified [official Setapp license](Notices/Setapp.txt),
-including in binary-only distributions.
+The official macOS framework initializes before `main`. In the Setapp app target:
+
+1. Add `-force_load "$(BUILT_PRODUCTS_DIR)/libSetapp.a"` to **Other Linker Flags**
+   along with the existing flags. Adjust the path for the app's build layout.
+   With command-line SwiftPM, use the staged `libSetapp.a` from its build products.
+   A direct archive link uses `Setapp.xcframework/macos-arm64_x86_64/libSetapp.a`.
+   [Setapp linker setup](https://docs.setapp.com/docs/setting-up-the-framework-1)
+2. Include the app's macOS Setapp public key at
+   `Contents/Resources/setappPublicKey.pem` in the main app bundle and use the
+   registered Setapp bundle identifier.
+   [Setapp integration requirements](https://docs.setapp.com/docs/integration-requirements)
+3. Verify the final app includes the Setapp resource bundle from the package
+   build and the unmodified [official Setapp license](Notices/Setapp.txt).
+   Both belong in the deliverable if you distribute the app as binaries.
 
 ## Development
 
