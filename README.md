@@ -177,7 +177,7 @@ mise exec -- make check
 Individual checks are `mise exec -- make test` (snapshots and Foundation
 observation), `make build-macos` (compile the official adapter),
 `make test-consumer` (run the external snapshot executable and compile the
-adapter), and `make test-tools` (portable fixture-boundary checks). Run each
+adapter), and `make test-fixtures` (portable fixture-boundary checks). Run each
 through `mise exec --`; none executes a vendor-linked executable.
 
 Maintainer lint, format and consumer checks use the public SDK Tooling revision in
@@ -216,7 +216,7 @@ the non-root user, and its `lease.json` must be exactly
 Its `gitconfig` must map the official repository to a file-only Git mirror
 containing the pinned 5.5.5 revision and tag. The probe enforces these prerequisites
 and does not provision a VM or lease. From that SDK checkout, run
-`mise exec -- python3 -B tools/check-app-link.py --lease <workspace-uuid>`. It builds only
+`mise exec -- python3 -B fixtures/swift-app-link/check-link.py --lease <workspace-uuid>`. It builds only
 the external `SetappLinkProbe` product, force-loads SwiftPM's staged macOS
 archive, and inspects a temporary unsigned app. It checks the linked Setapp
 version marker and adapter symbols, and compares the staged archive, resources

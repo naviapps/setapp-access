@@ -15,7 +15,8 @@ import tempfile
 import uuid
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+FIXTURE = Path(__file__).resolve().parent
+ROOT = FIXTURE.parents[1]
 PRODUCT = "SetappLinkProbe"
 VENDOR = "Setapp-framework"
 VERSION = "5.5.5"
@@ -239,7 +240,7 @@ def build_and_inspect(lease, work):
     for name in ("Package.swift", "Sources", "Tests", NOTICE):
         copy_input(ROOT / name, sdk / name)
     for name in ("Package.swift", "Sources"):
-        copy_input(ROOT / "fixtures/swift-app-link" / name, fixture / name)
+        copy_input(FIXTURE / name, fixture / name)
     scratch = work / "scratch"
     gitconfig = lease / "gitconfig"
     require(
