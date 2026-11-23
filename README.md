@@ -125,10 +125,11 @@ The official macOS framework initializes before `main`. In the Setapp app target
 2. Include the app's macOS Setapp public key at
    `Contents/Resources/setappPublicKey.pem` in the main app bundle and use the
    registered Setapp bundle identifier.
-   [Setapp integration requirements](https://docs.setapp.com/docs/integration-requirements)
 3. Verify the final app includes the Setapp resource bundle from the package
    build and the unmodified [official Setapp license](Notices/Setapp.txt).
    Both belong in the deliverable if you distribute the app as binaries.
+4. Sign the app with a Developer ID certificate and verify it on the latest macOS.
+   [Setapp integration requirements](https://docs.setapp.com/docs/integration-requirements)
 
 ## Development
 
