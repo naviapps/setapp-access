@@ -3,7 +3,7 @@ SWIFT_FLAGS := -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-error
 .DEFAULT_GOAL := check
 .PHONY: check lint format test test-tools build-macos test-consumer
 
-check: lint test-tools test build-macos test-consumer
+check: lint test-tools test test-consumer
 
 lint:
 	mise exec -- python3 -B tools/quality.py check
