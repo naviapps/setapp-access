@@ -183,10 +183,10 @@ through `mise exec --`; none executes a vendor-linked executable.
 Maintainer lint and format use the pinned `sdk-tooling` quality driver. Prepare
 only the tools in `mise.toml`, then run `make lint` or `make format`. Consumer
 installation does not run these developer tools. No .NET, Cargo or native artifact
-generation is needed in this repository. GitHub Actions runs `make check` on the
-Xcode 27 runner. It combines lint, tests and the external consumer that compiles
-the macOS adapter. The compatibility job runs Swift tests and compiles the adapter
-with Swift Build from Xcode 26.6 on macOS 26.
+generation is needed in this repository. GitHub Actions runs the Swift tests
+and the same external consumer on macOS 26 with Xcode 26.6 and macOS 27
+with Xcode 27.2. The external consumer compiles the macOS adapter on both.
+Lint and maintainer tooling checks run once on Xcode 27.2.
 The immutable shared tool revision is in `tools/tooling-sources.json`; see
 [shared developer setup](https://github.com/naviapps/sdk-tooling#readme) for
 authenticated source preparation, verified caches and offline use.
