@@ -5,11 +5,11 @@ SWIFT_6_3 = $(shell xcrun swift --version 2>/dev/null | grep -Eq 'Swift version 
 SWIFT_FLAGS = --build-system swiftbuild -Xswiftc -strict-concurrency=complete $(if $(SWIFT_6_3),,-Xswiftc -warnings-as-errors)
 
 .DEFAULT_GOAL := check
-.PHONY: check check-source lint format test test-fixtures build-macos test-consumer
+.PHONY: check check-source lint format test test-consumer-isolation build-macos test-consumer
 
 check: check-source test test-consumer
 
-check-source: lint test-fixtures
+check-source: lint test-consumer-isolation
 
 lint:
 	$(SDK_TOOLING) quality check
@@ -20,8 +20,8 @@ format:
 test:
 	xcrun swift test $(SWIFT_FLAGS)
 
-test-fixtures:
-	python3 -B -m unittest discover -s fixtures/tests -v
+test-consumer-isolation:
+	python3 -B -m unittest discover -s fixtures/consumers/swift -v
 
 build-macos:
 	xcrun swift build --target SetappAccessMacOS $(SWIFT_FLAGS)

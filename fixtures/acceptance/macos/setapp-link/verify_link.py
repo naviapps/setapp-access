@@ -16,7 +16,7 @@ import uuid
 from pathlib import Path
 
 FIXTURE = Path(__file__).resolve().parent
-ROOT = FIXTURE.parents[1]
+ROOT = FIXTURE.parents[3]
 PRODUCT = "SetappLinkProbe"
 VENDOR = "Setapp-framework"
 VERSION = "5.5.5"

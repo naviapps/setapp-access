@@ -7,7 +7,7 @@ import tomllib
 import unittest
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 
 
 def manifest(path):
@@ -40,7 +40,7 @@ class ConsumerBoundaryTests(unittest.TestCase):
         self.assertNotIn("executables", config)
 
     def test_fixture_declares_no_path_from_runtime_to_vendor_adapter(self):
-        fixture = manifest(ROOT / "fixtures/swift-consumer")
+        fixture = manifest(ROOT / "fixtures/consumers/swift")
         runtimes = [target for target in fixture["targets"] if target["type"] == "executable"]
         self.assertEqual([target["name"] for target in runtimes], ["SetappSnapshotConsumer"])
         self.assertEqual(

@@ -131,14 +131,14 @@ mise exec -- make check
 
 Run focused targets with `mise exec -- make <target>`:
 
-| Target          | Check                                                        |
-| --------------- | ------------------------------------------------------------ |
-| `test`          | Snapshot and observation behavior in the vendor-free product |
-| `test-consumer` | Run the external snapshot consumer and compile the macOS API |
-| `test-fixtures` | Inspect SwiftPM's evaluated graph for vendor isolation       |
-| `build-macos`   | Compile the adapter target                                   |
-| `lint`          | Check source and configuration                               |
-| `format`        | Format owned source and configuration                        |
+| Target                    | Check                                                        |
+| ------------------------- | ------------------------------------------------------------ |
+| `test`                    | Snapshot and observation behavior in the vendor-free product |
+| `test-consumer`           | Run the external snapshot consumer and compile the macOS API |
+| `test-consumer-isolation` | Inspect SwiftPM's evaluated graph for vendor isolation       |
+| `build-macos`             | Compile the adapter target                                   |
+| `lint`                    | Check source and configuration                               |
+| `format`                  | Format owned source and configuration                        |
 
 GitHub Actions runs the same tests and consumer on macOS 26 and 27. Maintainer
 lint and tooling checks run on macOS 27. The public SDK Tooling revision in
@@ -154,7 +154,7 @@ The directory's `lease.json` must contain `{"lease":"<workspace-uuid>"}` and its
 revision and tag. From the SDK checkout inside the guest, run:
 
 ```sh
-mise exec -- python3 -B fixtures/swift-app-link/check-link.py --lease "<workspace-uuid>"
+mise exec -- python3 -B fixtures/acceptance/macos/setapp-link/verify_link.py --lease "<workspace-uuid>"
 ```
 
 The probe force-loads the staged Setapp archive and inspects a temporary unsigned
