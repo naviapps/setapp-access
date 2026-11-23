@@ -1,6 +1,6 @@
 # SetappAccess
 
-Setapp access snapshots and observation for macOS 26 and Swift 6.4.
+Setapp access snapshots and observation for macOS 26 and Swift 6.3 or newer.
 
 Start with [installation](#installation), then choose
 [snapshot-only use](#snapshot-only-use) or [app integration](#app-integration).
@@ -160,7 +160,7 @@ An ordinary consumer resolves the package and uses its Swift products without a
 developer bootstrap. There is no generic core source pin, local core path override
 or core artifact preparation in this package.
 
-Maintainers need Xcode with Swift 6.4 and the macOS 26 SDK or later. From the
+Maintainers need Xcode with Swift 6.3 or newer and the macOS 26 SDK or later. From the
 repository root, review `mise.toml`, trust only that configuration and install its
 declared tools:
 
@@ -181,7 +181,8 @@ only the tools in `mise.toml`, then run `make lint` or `make format`. Consumer
 installation does not run these developer tools. No .NET, Cargo or native artifact
 generation is needed in this repository. GitHub Actions runs `make check` on the
 Xcode 27 runner. It combines lint, tests and the external consumer that compiles
-the macOS adapter.
+the macOS adapter. The compatibility job runs Swift tests and compiles the adapter
+with Xcode 26.6 on macOS 26.
 The immutable shared tool revision is in `tools/tooling-sources.json`; see
 [shared developer setup](https://github.com/naviapps/sdk-tooling#readme) for
 authenticated source preparation, verified caches and offline use.
