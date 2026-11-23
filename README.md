@@ -180,25 +180,20 @@ observation), `make build-macos` (compile the official adapter),
 adapter), and `make test-tools` (portable fixture-boundary checks). Run each
 through `mise exec --`; none executes a vendor-linked executable.
 
-Maintainer lint and format use the pinned `sdk-tooling` quality driver. Prepare
-only the tools in `mise.toml`, then run `make lint` or `make format`. Consumer
-installation does not run these developer tools. No .NET, Cargo or native artifact
-generation is needed in this repository. GitHub Actions runs the Swift tests
-and the same external consumer on macOS 26 with Xcode 26.6 and macOS 27
-with Xcode 27.2. The external consumer compiles the macOS adapter on both.
-Lint and maintainer tooling checks run once on Xcode 27.2.
-The immutable shared tool revision is in `tools/tooling-sources.json`; see
-[shared developer setup](https://github.com/naviapps/sdk-tooling#readme) for
-authenticated source preparation, verified caches and offline use.
+Maintainer lint and format use the tools declared in `mise.toml`. Run
+`make lint` to check source or `make format` to apply formatting. GitHub Actions
+runs the Swift tests and the same external consumer on macOS 26 with Xcode 26.6
+and macOS 27 with Xcode 27.2. The external consumer compiles the macOS adapter
+on both. Lint and maintainer tooling checks run once on Xcode 27.2.
 
-`make test-consumer` uses the pinned shared helper to copy only `Package.swift`,
-`Sources`, `Tests`, `Notices` and `LICENSE` into a disposable SDK beside the external
+`make test-consumer` copies `Package.swift`, `Sources`, `Tests`, `Notices` and
+`LICENSE` into a disposable SDK beside the external
 `fixtures/swift-consumer/` package. `Tests` preserves the manifest's source layout;
-the external package imports only public products. The helper removes developer
-tools and state, isolates SwiftPM caches/configuration and compiler/runtime
-environment, and builds with strict concurrency and warnings as errors. Explicit
-private dependency policy can be supplied with `--git-config` and `--mirror-config`.
-The official 5.5.5 vendor dependency and notice remain unchanged.
+the external package imports only public products. The check isolates SwiftPM
+state and runs Swift Build with strict concurrency and warnings as errors.
+The Make targets allow compiler warnings with Swift 6.3 to accommodate flags
+from the Setapp framework. Supply private dependency configuration directly to
+`tools/consumer.py` with `--git-config` and `--mirror-config`.
 
 The `SetappSnapshotConsumer` executable depends only on the vendor-free product.
 It checks active, inactive and unavailable snapshots, including expiration metadata

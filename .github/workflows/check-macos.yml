@@ -12,10 +12,34 @@ concurrency:
   cancel-in-progress: true
 jobs:
   swift:
-    uses: naviapps/sdk-tooling/.github/workflows/check-sdk-swift.yml@2ec2db1d8629260420885a5c8a9e0f836cdead6f
-    with:
-      swift-build: true
-      allow-swift-6-3-warnings: true
+    name: Swift checks (macOS ${{ matrix.macos }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - macos: "26"
+            runner: macos-26
+            xcode: /Applications/Xcode_26.6.app/Contents/Developer
+          - macos: "27"
+            runner: xcode-27
+            xcode: /Applications/Xcode_27.2.app/Contents/Developer
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: ${{ matrix.xcode }}
+      GIT_TERMINAL_PROMPT: "0"
+    steps:
+      - uses: actions/checkout@v6.1.0
+        with:
+          persist-credentials: false
+      - name: Check Swift toolchain
+        run: |
+          sw_vers
+          xcrun swift --version
+      - name: Test Swift SDK
+        run: make test
+      - name: Test standalone Swift consumer
+        run: make test-consumer
   distribution:
     name: Source and tooling checks
     runs-on: xcode-27
