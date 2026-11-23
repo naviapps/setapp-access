@@ -116,10 +116,11 @@ final class SubscriptionObservation: Sendable {
   }
 
   func cancel() {
-    let removed = state.withLockUnchecked {
-      $0.refresh = .cancelled
-      defer { $0.token = nil }
-      return $0.token
+    let removed = state.withLockUnchecked { state in
+      state.refresh = .cancelled
+      let token = state.token
+      state.token = nil
+      return token
     }
     if let removed { center.removeObserver(removed) }
   }
