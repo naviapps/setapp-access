@@ -248,88 +248,47 @@ private final class Subscription {
   rereadSignal.finish()
 }
 
-@Test @MainActor func alreadyCancelledTaskInstallsNoObserverAndReadsNoSubscription() async {
-  let center = TrackingCenter()
-  let subscription = Subscription(isActive: true)
-  let task = Task { @MainActor in
-    withUnsafeCurrentTask { $0?.cancel() }
-    let stream = SubscriptionUpdates.make(
-      center: center, name: .init("subscription"), readSnapshot: { subscription.read() })
-    var iterator = stream.makeAsyncIterator()
-    #expect(await iterator.next() == nil)
-  }
-  await task.value
-  #expect(subscription.reads == 0)
-  #expect(center.removedCount == 0)
+private enum StartupCancellation: CaseIterable {
+  case beforeRegistration, duringRegistration, duringRead
 }
 
-@Test @MainActor func observationCancelledAtRegistrationSkipsReadsAndCallbacks() async {
-  for cancelDuringRegistration in [false, true] {
-    let center = TrackingCenter(cancelDuringRegistration: cancelDuringRegistration)
-    let subscription = Subscription(isActive: true)
-    let task = Task { @MainActor in
-      if !cancelDuringRegistration { withUnsafeCurrentTask { $0?.cancel() } }
+@Test(arguments: StartupCancellation.allCases, [false, true])
+@MainActor private func cancellationDuringStartupEndsObservationBeforeDelivery(
+  cancellation: StartupCancellation, useHandler: Bool
+) async {
+  let center = TrackingCenter(cancelDuringRegistration: cancellation == .duringRegistration)
+  let name = Notification.Name("subscription")
+  let subscription = Subscription(isActive: true)
+  if cancellation == .duringRead {
+    subscription.onRead = { withUnsafeCurrentTask { $0?.cancel() } }
+  }
+  let expectedRemovals = cancellation == .beforeRegistration ? 0 : 1
+
+  let producer = Task { @MainActor () -> AsyncStream<SetappAccessSnapshot>? in
+    if cancellation == .beforeRegistration { withUnsafeCurrentTask { $0?.cancel() } }
+    if useHandler {
       await SubscriptionUpdates.observe(
-        center: center, name: .init("subscription"), readSnapshot: { subscription.read() }
+        center: center, name: name, readSnapshot: { subscription.read() }
       ) { _ in
         Issue.record("An observation cancelled at startup delivered a snapshot.")
       }
+      #expect(Task.isCancelled)
+      return nil
     }
-    await task.value
-    #expect(subscription.reads == 0)
-    #expect(center.removedCount == (cancelDuringRegistration ? 1 : 0))
-  }
-}
-
-@Test @MainActor func cancellationDuringRegistrationSkipsInitialReadAndRemovesObserver() async {
-  let center = TrackingCenter(cancelDuringRegistration: true)
-  let name = Notification.Name("subscription")
-  let subscription = Subscription(isActive: true)
-  let task = Task { @MainActor in
     let stream = SubscriptionUpdates.make(
       center: center, name: name, readSnapshot: { subscription.read() })
     #expect(Task.isCancelled)
-    #expect(center.removedCount == 1)
+    #expect(center.removedCount == expectedRemovals)
+    return stream
+  }
+  if let stream = await producer.value {
+    // Observe completion from a different task so cancellation cannot mask a buffered value.
     var iterator = stream.makeAsyncIterator()
     #expect(await iterator.next() == nil)
   }
-  await task.value
-  center.post(name: name, object: nil)
-  await Task.yield()
-  #expect(subscription.reads == 0)
-  #expect(center.removedCount == 1)
-}
-
-@Test @MainActor func cancellationDuringInitialReadFinishesStreamBeforeHandoff() async {
-  let center = TrackingCenter()
-  let name = Notification.Name("subscription")
-  let subscription = Subscription(isActive: true)
-  subscription.onRead = { withUnsafeCurrentTask { $0?.cancel() } }
-
-  let producer = Task { @MainActor in
-    let stream = SubscriptionUpdates.make(
-      center: center, name: name, readSnapshot: { subscription.read() })
-    #expect(Task.isCancelled)
-    return stream
-  }
-  let stream = await producer.value
-  #expect(center.removedCount == 1)
-  var iterator = stream.makeAsyncIterator()
-  let update = await iterator.next()
-  #expect(update == nil)
 
   center.post(name: name, object: nil)
   await Task.yield()
-  #expect(subscription.reads == 1)
-  #expect(center.removedCount == 1)
-}
-
-@Test func cancellationBeforeObserverInstallationRemovesLateTokenOnce() {
-  let center = TrackingCenter()
-  let observation = SubscriptionObservation(center: center)
-  observation.cancel()
-  let token = center.addObserver(forName: .init("subscription"), object: nil, queue: nil) { _ in }
-  observation.install(token)
-  observation.cancel()
-  #expect(center.removedCount == 1)
+  #expect(subscription.reads == (cancellation == .duringRead ? 1 : 0))
+  #expect(center.removedCount == expectedRemovals)
 }

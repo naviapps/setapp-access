@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 /// Native observation mechanics, isolated from the auto-initializing vendor framework.
 package enum SubscriptionUpdates {
@@ -74,48 +75,51 @@ package enum SubscriptionUpdates {
 
 // The lock covers observer lifetime and admission of one pending main-actor read.
 // Removing observers, reading subscriptions, and yielding snapshots happen outside it.
-final class SubscriptionObservation: @unchecked Sendable {
-  private let lock = NSLock()
+final class SubscriptionObservation: Sendable {
+  private enum Refresh { case idle, pending, cancelled }
+
+  private struct State {
+    var token: (any NSObjectProtocol)?
+    var refresh = Refresh.idle
+  }
+
+  // Foundation's opaque token is only stored here and passed back to the same center.
+  private let state = OSAllocatedUnfairLock(uncheckedState: State())
   private let center: NotificationCenter
-  private var token: (any NSObjectProtocol)?
-  private var cancelled = false
-  private var refreshPending = false
 
   init(center: NotificationCenter) { self.center = center }
 
   func requestRefresh() -> Bool {
-    lock.withLock {
-      guard !cancelled, !refreshPending else { return false }
-      refreshPending = true
+    state.withLock {
+      guard $0.refresh == .idle else { return false }
+      $0.refresh = .pending
       return true
     }
   }
 
   func beginRefresh() -> Bool {
-    lock.withLock {
-      guard !cancelled, refreshPending else { return false }
+    state.withLock {
+      guard $0.refresh == .pending else { return false }
       // Allow a follow-up if the snapshot read itself triggers another notification.
-      refreshPending = false
+      $0.refresh = .idle
       return true
     }
   }
 
   func install(_ token: any NSObjectProtocol) {
-    let remove = lock.withLock {
-      if cancelled { return true }
-      self.token = token
-      return false
+    let installed = state.withLockUnchecked {
+      guard $0.refresh != .cancelled else { return false }
+      $0.token = token
+      return true
     }
-    if remove { center.removeObserver(token) }
+    if !installed { center.removeObserver(token) }
   }
 
   func cancel() {
-    let removed = lock.withLock {
-      cancelled = true
-      refreshPending = false
-      let removed = token
-      token = nil
-      return removed
+    let removed = state.withLockUnchecked {
+      $0.refresh = .cancelled
+      defer { $0.token = nil }
+      return $0.token
     }
     if let removed { center.removeObserver(removed) }
   }

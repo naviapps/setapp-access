@@ -1,10 +1,34 @@
 """Protect the fixture's separation from auto-initializing vendor code."""
 
+import json
+import subprocess
+import tempfile
 import tomllib
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def manifest(path):
+    with tempfile.TemporaryDirectory(prefix="setapp-package-graph-") as scratch:
+        return json.loads(
+            subprocess.check_output(
+                [
+                    "/usr/bin/xcrun",
+                    "swift",
+                    "package",
+                    "--package-path",
+                    str(path),
+                    "--scratch-path",
+                    scratch,
+                    "--manifest-cache",
+                    "none",
+                    "dump-package",
+                ],
+                timeout=30,
+            )
+        )
 
 
 class ConsumerBoundaryTests(unittest.TestCase):
@@ -16,22 +40,26 @@ class ConsumerBoundaryTests(unittest.TestCase):
         self.assertNotIn("executables", config)
 
     def test_fixture_declares_no_path_from_runtime_to_vendor_adapter(self):
-        fixture = ROOT / "fixtures/swift-consumer"
-        manifest = (fixture / "Package.swift").read_text()
-        runtime = manifest.split(".executableTarget(", 1)[1].split(".target(", 1)[0]
-        self.assertEqual(manifest.count(".executableTarget("), 1)
-        self.assertIn('name: "SetappSnapshotConsumer"', runtime)
-        self.assertIn('.product(name: "SetappAccess",', runtime)
-        self.assertNotIn("SetappAccessMacOS", runtime)
-        self.assertNotIn("SetappMacOSCompileOnly", runtime)
-        self.assertNotIn(".dynamic", manifest)
-        self.assertIn(
-            '.library(name: "SetappMacOSCompileOnly", targets: ["SetappMacOSCompileOnly"])',
-            manifest,
+        fixture = manifest(ROOT / "fixtures/swift-consumer")
+        runtimes = [target for target in fixture["targets"] if target["type"] == "executable"]
+        self.assertEqual([target["name"] for target in runtimes], ["SetappSnapshotConsumer"])
+        self.assertEqual(
+            runtimes[0]["dependencies"],
+            [{"product": ["SetappAccess", "setapp-access", None, None]}],
         )
-        source = (fixture / "Sources/SetappSnapshotConsumer/Consumer.swift").read_text()
-        imports = [line for line in source.splitlines() if line.startswith("import ")]
-        self.assertEqual(imports, ["import Foundation", "import SetappAccess"])
+        self.assertEqual(
+            [product["type"] for product in fixture["products"]], [{"library": ["automatic"]}]
+        )
+
+        sdk = manifest(ROOT)
+        targets = {target["name"]: target for target in sdk["targets"]}
+        products = {product["name"]: product for product in sdk["products"]}
+        self.assertEqual(products["SetappAccess"]["targets"], ["SetappAccess"])
+        self.assertEqual(targets["SetappAccess"]["dependencies"], [])
+        self.assertEqual(
+            [target["dependencies"] for target in sdk["targets"] if target["type"] == "test"],
+            [[{"byName": ["SetappAccess", None]}]],
+        )
 
 
 if __name__ == "__main__":
