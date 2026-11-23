@@ -74,6 +74,10 @@ Setapp. SwiftPM still resolves the official framework as a package dependency,
 so a fresh resolution needs access to its repository even for snapshot-only
 use. Developer tooling is not part of installation.
 
+For SwiftPM command-line builds that link `SetappAccessMacOS` with Swift 6.3,
+pass `--build-system swiftbuild` to `swift build` or `swift test` so SwiftPM
+can load the vendor XCFramework's Swift module. Xcode uses Swift Build.
+
 ## Snapshot-only use
 
 The vendor-free value can be constructed in host tests without importing Setapp:
@@ -160,7 +164,7 @@ An ordinary consumer resolves the package and uses its Swift products without a
 developer bootstrap. There is no generic core source pin, local core path override
 or core artifact preparation in this package.
 
-Maintainers need Xcode with Swift 6.3 or newer and the macOS 26 SDK or later. From the
+Use Xcode 27 or later for the full maintainer checks. From the
 repository root, review `mise.toml`, trust only that configuration and install its
 declared tools:
 
@@ -182,7 +186,7 @@ installation does not run these developer tools. No .NET, Cargo or native artifa
 generation is needed in this repository. GitHub Actions runs `make check` on the
 Xcode 27 runner. It combines lint, tests and the external consumer that compiles
 the macOS adapter. The compatibility job runs Swift tests and compiles the adapter
-with Xcode 26.6 on macOS 26.
+with Swift Build from Xcode 26.6 on macOS 26.
 The immutable shared tool revision is in `tools/tooling-sources.json`; see
 [shared developer setup](https://github.com/naviapps/sdk-tooling#readme) for
 authenticated source preparation, verified caches and offline use.

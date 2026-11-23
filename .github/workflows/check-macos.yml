@@ -45,6 +45,6 @@ jobs:
       - name: Check Swift toolchain
         run: xcrun swift --version
       - name: Test Swift SDK
-        run: xcrun swift test -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
+        run: xcrun swift test --build-system swiftbuild -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
       - name: Build macOS adapter
-        run: xcrun swift build --target SetappAccessMacOS -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
+        run: xcrun swift build --build-system swiftbuild --target SetappAccessMacOS -Xswiftc -strict-concurrency=complete -Xswiftc -warnings-as-errors
