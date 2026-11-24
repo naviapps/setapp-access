@@ -3,4 +3,4 @@
 # Docs: https://gh.io/actions-lockfile
 version: 'v0.0.3'
 workflows:
-    '.github/workflows/check-macos.yml': []
+    '.github/workflows/check.yml': []
