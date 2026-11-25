@@ -4,7 +4,7 @@ Setapp access snapshots and observation for macOS 26 and Swift 6.3 or newer.
 
 - `SetappAccess` provides the vendor-free Swift snapshot contract for host code and tests.
 - `SetappAccessMacOS` adds the main-actor `SetappSession` using the official
-  [MacPaw Setapp framework](https://github.com/MacPaw/Setapp-framework), pinned to 5.5.5.
+  [MacPaw Setapp framework](https://github.com/MacPaw/Setapp-framework), pinned to 5.5.6.
   Link this product in the Setapp app build only.
 
 ## Access contract
@@ -164,7 +164,7 @@ compiler warnings allowed under Swift 6.3 for the vendor resource target.
 The app link probe requires an existing owned ARM64 macOS VM lease. Place the SDK
 under the non-root user's private `/tmp/workspace-<workspace-uuid>` directory.
 The directory's `lease.json` must contain `{"lease":"<workspace-uuid>"}` and its
-`gitconfig` must map the official repository to a file-only mirror with the 5.5.5
+`gitconfig` must map the official repository to a file-only mirror with the 5.5.6
 revision and tag. From the SDK checkout inside the guest, run:
 
 ```sh

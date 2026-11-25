@@ -2,10 +2,10 @@
 activate_aggressive = true
 
 [tools]
-python = "3.15.1"
-uv = "0.13.6"
-ruff = "0.17.3"
-dprint = "0.64.3"
+python = "3.15.2"
+uv = "0.13.10"
+ruff = "0.17.6"
+dprint = "0.65.0"
 swiftlint = { version = "0.65.1", os = ["macos"] }
 jactionlint = "2.6.0"
 
@@ -18,4 +18,4 @@ description = "Format owned source while preserving original notices"
 run = "mise run sdk-tooling -- quality format"
 
 [tasks.sdk-tooling]
-run = "uvx --from git+https://github.com/naviapps/sdk-tooling.git@c80aebadffbab8d09a14456e987db5ad273f6879 sdk-tooling"
+run = "uvx --from git+https://github.com/naviapps/sdk-tooling.git@9ff679a53617d014c0c85345894dfe1bd54c3974 sdk-tooling"

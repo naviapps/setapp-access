@@ -9,7 +9,7 @@ let package = Package(
     .library(name: "SetappAccessMacOS", targets: ["SetappAccessMacOS"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/MacPaw/Setapp-framework.git", exact: "5.5.5")
+    .package(url: "https://github.com/MacPaw/Setapp-framework.git", exact: "5.5.6")
   ],
   targets: [
     .target(name: "SetappAccess"),
