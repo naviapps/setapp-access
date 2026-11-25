@@ -18,7 +18,8 @@ let package = Package(
     .target(
       name: "SetappMacOSCompileOnly",
       dependencies: [
-        .product(name: "SetappAccessMacOS", package: "setapp-access")
+        .product(name: "SetappAccess", package: "setapp-access"),
+        .product(name: "SetappAccessMacOS", package: "setapp-access"),
       ]),
   ]
 )
