@@ -33,7 +33,8 @@ def manifest(path):
 
 class ConsumerBoundaryTests(unittest.TestCase):
     def test_checks_execute_only_the_vendor_free_product(self):
-        config = tomllib.loads((ROOT / "sdk-checks.toml").read_text(encoding="utf-8"))["swift"]
+        manifest = tomllib.loads((ROOT / "sdk-tooling.toml").read_text(encoding="utf-8"))
+        config = manifest["checks"]["swift"]
         self.assertTrue(config["verify_dependencies"])
         self.assertEqual(config["build_system"], "swiftbuild")
         self.assertEqual(config["executable"], "SetappSnapshotConsumer")

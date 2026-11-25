@@ -1,4 +1,4 @@
-[swift]
+[checks.swift]
 inputs = ["Package.swift", "Sources", "Tests", "Notices", "LICENSE"]
 executable = "SetappSnapshotConsumer"
 build_system = "swiftbuild"
