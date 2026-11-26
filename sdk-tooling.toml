@@ -1,5 +1,5 @@
 [checks.swift]
-inputs = ["Package.swift", "Sources", "Tests", "Notices", "LICENSE"]
+inputs = ["Package.swift", "Sources", "Notices", "LICENSE"]
 executable = "SetappSnapshotConsumer"
 build_system = "swiftbuild"
 verify_dependencies = true

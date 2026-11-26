@@ -154,13 +154,12 @@ Run focused targets with `mise exec -- make <target>`:
 | `lint`                    | Check source and configuration                               |
 | `format`                  | Format owned source and configuration                        |
 
-`test-consumer` checks the evaluated SwiftPM graph before building the consumer.
-GitHub Actions runs the same tests and consumer on macOS 26 and 27. Maintainer
-lint and tooling checks run on macOS 27. The public SDK Tooling revision in
-`mise.toml` isolates the external consumer's SwiftPM state. Its vendor target is
-an automatic library that compiles against the public adapter API. The snapshot
-executable links only `SetappAccess`. Swift Build uses strict concurrency, with
-compiler warnings allowed under Swift 6.3 for the vendor resource target.
+`test-consumer` checks the evaluated SwiftPM graph before building the isolated
+consumer. Its vendor target compiles against the public adapter API, while the
+snapshot executable links only `SetappAccess`. GitHub Actions runs the tests
+and consumer on macOS 26 and 27 and runs lint and tooling checks on macOS 27.
+Swift 6.3 invocations allow warnings because Swift Build passes
+`-suppress-warnings` to the vendor resource target.
 
 The app link probe requires an existing owned ARM64 macOS VM lease. Place the SDK
 under the non-root user's private `/tmp/workspace-<workspace-uuid>` directory.
