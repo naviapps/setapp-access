@@ -30,5 +30,5 @@ clean:
 	$(SDK_TOOLING) clean .build fixtures/consumers/swift/.build \
 	  fixtures/acceptance/macos/setapp-link/.build
 
-test-consumer:
+test-consumer: test-consumer-isolation
 	$(SDK_TOOLING) swift-consumer $(if $(SWIFT_6_3),--allow-warnings)

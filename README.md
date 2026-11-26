@@ -154,6 +154,7 @@ Run focused targets with `mise exec -- make <target>`:
 | `lint`                    | Check source and configuration                               |
 | `format`                  | Format owned source and configuration                        |
 
+`test-consumer` checks the evaluated SwiftPM graph before building the consumer.
 GitHub Actions runs the same tests and consumer on macOS 26 and 27. Maintainer
 lint and tooling checks run on macOS 27. The public SDK Tooling revision in
 `mise.toml` isolates the external consumer's SwiftPM state. Its vendor target is
